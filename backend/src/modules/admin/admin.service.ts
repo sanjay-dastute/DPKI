@@ -21,7 +21,7 @@ export class AdminService {
     const documents = await this.documentsService.findAll();
 
     const usersByRole = {
-      citizen: users.filter(user => user.role === UserRole.CITIZEN).length,
+      individual: users.filter(user => user.role === UserRole.INDIVIDUAL).length,
       tourist: users.filter(user => user.role === UserRole.TOURIST).length,
       business: users.filter(user => user.role === UserRole.BUSINESS).length,
       government: users.filter(user => user.role === UserRole.GOVERNMENT).length,
@@ -67,7 +67,16 @@ export class AdminService {
   async getAuditLogs(limit = 100, offset = 0) {
     // In a real implementation, we would fetch audit logs from the database
     // For now, we'll just return dummy data
-    const auditLogs = [];
+    const auditLogs: Array<{
+      id: string;
+      userId: string;
+      action: string;
+      resourceType: string;
+      resourceId: string;
+      timestamp: Date;
+      ipAddress: string;
+    }> = [];
+    
     for (let i = 0; i < limit; i++) {
       auditLogs.push({
         id: `log-${i + offset}`,

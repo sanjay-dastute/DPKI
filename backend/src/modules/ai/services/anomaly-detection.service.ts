@@ -291,7 +291,12 @@ export class AnomalyDetectionService {
     }
     
     // Generate risk factors
-    const riskFactors = [];
+    const riskFactors: Array<{
+      factor: string;
+      description: string;
+      impact: number;
+    }> = [];
+    
     const possibleFactors = [
       {
         factor: 'ACCOUNT_AGE',
@@ -338,7 +343,7 @@ export class AnomalyDetectionService {
     }
     
     // Generate recommendations based on risk level
-    const recommendations = [];
+    const recommendations: string[] = [];
     if (riskLevel === 'LOW') {
       recommendations.push('Continue standard monitoring');
     } else if (riskLevel === 'MEDIUM') {
