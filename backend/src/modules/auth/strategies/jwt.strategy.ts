@@ -10,10 +10,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private configService: ConfigService,
     private usersService: UsersService,
   ) {
+    const secretKey = configService.get<string>('jwt.secret') || 'quantumtrust_secret_key_replace_in_production';
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get('jwt.secret'),
+      secretOrKey: secretKey,
     });
   }
 
