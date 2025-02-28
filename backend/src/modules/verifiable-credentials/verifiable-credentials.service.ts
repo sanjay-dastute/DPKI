@@ -27,11 +27,53 @@ export class VerifiableCredentialsService {
     }
     return credential;
   }
+  
+  async findOne(id: string): Promise<VerifiableCredential> {
+    return this.findById(id);
+  }
 
   async findByDID(did: string): Promise<VerifiableCredential[]> {
     return this.verifiableCredentialModel.find({ did }).exec();
   }
+  
+  async findByIssuer(issuerId: string): Promise<VerifiableCredential[]> {
+    return this.verifiableCredentialModel.find({ issuer: issuerId }).exec();
+  }
+  
+  async findByHolder(holderId: string): Promise<VerifiableCredential[]> {
+    return this.verifiableCredentialModel.find({ 'credentialSubject.id': holderId }).exec();
+  }
 
+  async create(createDto: any): Promise<VerifiableCredential> {
+    return this.issue(
+      createDto.issuer,
+      createDto.did,
+      createDto.type,
+      createDto.credentialSubject?.claims || {},
+      createDto.expirationDate
+    );
+  }
+  
+  async update(id: string, updateDto: any): Promise<VerifiableCredential> {
+    const credential = await this.findById(id);
+    
+    // Update allowed fields
+    if (updateDto.status) {
+      credential.status = updateDto.status;
+    }
+    
+    if (updateDto.expirationDate) {
+      credential.expirationDate = updateDto.expirationDate;
+    }
+    
+    // Save and return updated credential
+    return this.verifiableCredentialModel.findOneAndUpdate(
+      { id },
+      { $set: credential },
+      { new: true }
+    ).exec();
+  }
+  
   async issue(
     issuerDid: string,
     holderDid: string,
@@ -65,7 +107,7 @@ export class VerifiableCredentialsService {
     });
     
     // Save credential
-    return credential.save();
+    return this.verifiableCredentialModel.create(credential);
   }
 
   async verify(id: string): Promise<boolean> {
@@ -93,7 +135,11 @@ export class VerifiableCredentialsService {
     }
     
     credential.status = CredentialStatus.REVOKED;
-    return credential.save();
+    return this.verifiableCredentialModel.findOneAndUpdate(
+      { id },
+      { $set: { status: CredentialStatus.REVOKED } },
+      { new: true }
+    ).exec();
   }
 
   private generateProof(issuerDid: string, holderDid: string, claims: Record<string, any>): any {

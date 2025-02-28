@@ -27,6 +27,10 @@ export class DocumentsService {
     }
     return document;
   }
+  
+  async findOne(id: string): Promise<Document> {
+    return this.findById(id);
+  }
 
   async findByDID(did: string): Promise<Document[]> {
     return this.documentModel.find({ did }).exec();
@@ -88,7 +92,7 @@ export class DocumentsService {
     });
     
     // Save document
-    return document.save();
+    return this.documentModel.create(document);
   }
 
   async verify(id: string): Promise<Document> {
@@ -99,7 +103,11 @@ export class DocumentsService {
     }
     
     document.status = DocumentStatus.VERIFIED;
-    return document.save();
+    return this.documentModel.findOneAndUpdate(
+      { id },
+      { $set: { status: DocumentStatus.VERIFIED } },
+      { new: true }
+    ).exec() as Promise<Document>;
   }
 
   async reject(id: string): Promise<Document> {
@@ -110,7 +118,11 @@ export class DocumentsService {
     }
     
     document.status = DocumentStatus.REJECTED;
-    return document.save();
+    return this.documentModel.findOneAndUpdate(
+      { id },
+      { $set: { status: DocumentStatus.REJECTED } },
+      { new: true }
+    ).exec() as Promise<Document>;
   }
 
   async delete(id: string): Promise<void> {
