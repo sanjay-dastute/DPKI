@@ -17,6 +17,7 @@ import { BlockchainModule } from './modules/blockchain/blockchain.module';
 import { VerifiableCredentialsModule } from './modules/verifiable-credentials/verifiable-credentials.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { AdminModule } from './modules/admin/admin.module';
     VerifiableCredentialsModule,
     DocumentsModule,
     AdminModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
