@@ -1,11 +1,11 @@
 import blockchainConfig from './blockchain.config';
 
 export default (): Record<string, any> => ({
-  port: parseInt(process.env.PORT, 10) || 3000,
+  port: parseInt(process.env.PORT || '3000', 10),
   database: {
     postgres: {
       host: process.env.POSTGRES_HOST || 'localhost',
-      port: parseInt(process.env.POSTGRES_PORT, 10) || 5432,
+      port: parseInt(process.env.POSTGRES_PORT || '5432', 10),
       username: process.env.POSTGRES_USER || 'postgres',
       password: process.env.POSTGRES_PASSWORD || 'postgres',
       database: process.env.POSTGRES_DB || 'quantumtrust',
@@ -16,7 +16,7 @@ export default (): Record<string, any> => ({
     },
     redis: {
       host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT, 10) || 6379,
+      port: parseInt(process.env.REDIS_PORT || '6379', 10),
     },
   },
   jwt: {
