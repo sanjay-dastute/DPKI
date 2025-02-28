@@ -34,7 +34,7 @@ export class CredentialSubject {
 }
 
 @Schema({ timestamps: true })
-export class VerifiableCredential extends Document {
+export class VerifiableCredential {
   @Prop({ required: true, unique: true })
   id: string;
 

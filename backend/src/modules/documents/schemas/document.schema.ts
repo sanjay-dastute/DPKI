@@ -28,7 +28,7 @@ export class AIVerificationResult {
 }
 
 @Schema({ timestamps: true })
-export class Document extends MongoDocument {
+export class Document {
   @Prop({ required: true, unique: true })
   id: string;
 
