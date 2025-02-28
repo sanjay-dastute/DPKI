@@ -53,10 +53,10 @@ export class VerifiableCredential {
   @Prop()
   expirationDate: Date;
 
-  @Prop({ type: CredentialSubject, required: true })
+  @Prop({ type: () => CredentialSubject, required: true })
   credentialSubject: CredentialSubject;
 
-  @Prop({ type: Proof, required: true })
+  @Prop({ type: () => Proof, required: true })
   proof: Proof;
 
   @Prop({
