@@ -41,7 +41,10 @@ export class DIDService {
     return this.didRepository.find({ where: { userId } });
   }
 
-  async create(userId: string): Promise<DID> {
+  async create(input: any): Promise<DID> {
+    // If input is a string, treat it as userId
+    const userId = typeof input === 'string' ? input : input.controller;
+    
     // Check if user exists
     const user = await this.usersService.findById(userId);
     
@@ -80,6 +83,26 @@ export class DIDService {
     await this.usersService.update(userId, { did });
     
     return savedDID;
+  }
+  
+  async update(id: string, updateData: any): Promise<DID> {
+    const did = await this.findById(id);
+    
+    // Only allow updating certain fields
+    if (updateData.status) {
+      did.status = updateData.status;
+    }
+    
+    return this.didRepository.save(did);
+  }
+  
+  async remove(id: string): Promise<void> {
+    const did = await this.findById(id);
+    await this.didRepository.remove(did);
+  }
+  
+  async findByController(controllerId: string): Promise<DID[]> {
+    return this.findByUserId(controllerId);
   }
 
   async revoke(id: string): Promise<DID> {
