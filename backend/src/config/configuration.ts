@@ -1,3 +1,5 @@
+import blockchainConfig from './blockchain.config';
+
 export default (): Record<string, any> => ({
   port: parseInt(process.env.PORT, 10) || 3000,
   database: {
@@ -26,16 +28,7 @@ export default (): Record<string, any> => ({
     clientSecret: process.env.OAUTH_CLIENT_SECRET,
     callbackUrl: process.env.OAUTH_CALLBACK_URL,
   },
-  blockchain: {
-    ethereum: {
-      rpcUrl: process.env.ETHEREUM_RPC_URL || 'http://localhost:8545',
-      privateKey: process.env.ETHEREUM_PRIVATE_KEY,
-    },
-    hyperledger: {
-      indyPoolName: process.env.INDY_POOL_NAME || 'quantumtrust_pool',
-      indyPoolConfig: process.env.INDY_POOL_CONFIG || '{"genesis_txn": "./config/indy_genesis.txn"}',
-    },
-  },
+  blockchain: blockchainConfig(),
   security: {
     encryptionKey: process.env.ENCRYPTION_KEY || 'quantumtrust_encryption_key_replace_in_production',
   },
