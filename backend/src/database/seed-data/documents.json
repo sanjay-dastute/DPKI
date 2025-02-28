@@ -1,0 +1,169 @@
+[
+  {
+    "id": "1",
+    "name": "National ID Card",
+    "type": "IDENTITY",
+    "issuer": "Singapore Immigration & Checkpoints Authority",
+    "issuanceDate": "2025-01-15T10:30:00Z",
+    "expirationDate": "2035-01-15T10:30:00Z",
+    "documentNumber": "S1234567A",
+    "country": "Singapore",
+    "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "status": "VERIFIED",
+    "metadata": {
+      "documentType": "National ID",
+      "holderName": "John Citizen",
+      "dateOfBirth": "1985-05-15",
+      "nationality": "Singaporean"
+    },
+    "verificationResult": {
+      "verified": true,
+      "verifiedAt": "2025-01-15T11:00:00Z",
+      "verifiedBy": "did:indy:sovrin:gov123456789abcdefghi1",
+      "score": 0.98
+    },
+    "createdAt": "2025-01-15T10:30:00Z",
+    "updatedAt": "2025-01-15T11:00:00Z",
+    "userId": "1"
+  },
+  {
+    "id": "2",
+    "name": "Driver's License",
+    "type": "LICENSE",
+    "issuer": "Singapore Traffic Police",
+    "issuanceDate": "2025-01-16T11:30:00Z",
+    "expirationDate": "2030-01-16T11:30:00Z",
+    "documentNumber": "S98765432B",
+    "country": "Singapore",
+    "hash": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+    "status": "VERIFIED",
+    "metadata": {
+      "documentType": "Driver's License",
+      "holderName": "John Citizen",
+      "licenseClass": "Class 3",
+      "restrictions": "None"
+    },
+    "verificationResult": {
+      "verified": true,
+      "verifiedAt": "2025-01-16T12:00:00Z",
+      "verifiedBy": "did:indy:sovrin:gov123456789abcdefghi1",
+      "score": 0.97
+    },
+    "createdAt": "2025-01-16T11:30:00Z",
+    "updatedAt": "2025-01-16T12:00:00Z",
+    "userId": "1"
+  },
+  {
+    "id": "3",
+    "name": "UK Passport",
+    "type": "PASSPORT",
+    "issuer": "United Kingdom Passport Office",
+    "issuanceDate": "2023-06-10T09:00:00Z",
+    "expirationDate": "2033-06-10T09:00:00Z",
+    "documentNumber": "GBR123456",
+    "country": "United Kingdom",
+    "hash": "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3",
+    "status": "VERIFIED",
+    "metadata": {
+      "documentType": "Passport",
+      "holderName": "Emma Tourist",
+      "dateOfBirth": "1990-03-22",
+      "nationality": "British",
+      "gender": "Female"
+    },
+    "verificationResult": {
+      "verified": true,
+      "verifiedAt": "2025-01-20T15:30:00Z",
+      "verifiedBy": "did:indy:sovrin:gov123456789abcdefghi1",
+      "score": 0.99
+    },
+    "createdAt": "2025-01-20T15:15:00Z",
+    "updatedAt": "2025-01-20T15:30:00Z",
+    "userId": "6"
+  },
+  {
+    "id": "4",
+    "name": "Singapore Tourist Visa",
+    "type": "VISA",
+    "issuer": "Singapore Immigration & Checkpoints Authority",
+    "issuanceDate": "2025-01-20T16:00:00Z",
+    "expirationDate": "2025-07-20T16:00:00Z",
+    "documentNumber": "SG-VISA-123456",
+    "country": "Singapore",
+    "hash": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+    "status": "VERIFIED",
+    "metadata": {
+      "documentType": "Tourist Visa",
+      "holderName": "Emma Tourist",
+      "visaType": "Tourist",
+      "entryDate": "2025-01-21",
+      "exitDate": "2025-07-20",
+      "numberOfEntries": "Multiple"
+    },
+    "verificationResult": {
+      "verified": true,
+      "verifiedAt": "2025-01-20T16:30:00Z",
+      "verifiedBy": "did:indy:sovrin:gov123456789abcdefghi1",
+      "score": 0.98
+    },
+    "createdAt": "2025-01-20T16:00:00Z",
+    "updatedAt": "2025-01-20T16:30:00Z",
+    "userId": "6"
+  },
+  {
+    "id": "5",
+    "name": "Business Registration Certificate",
+    "type": "BUSINESS_REGISTRATION",
+    "issuer": "Accounting and Corporate Regulatory Authority (ACRA)",
+    "issuanceDate": "2025-01-25T10:30:00Z",
+    "expirationDate": "2030-01-25T10:30:00Z",
+    "documentNumber": "202501234R",
+    "country": "Singapore",
+    "hash": "d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5",
+    "status": "VERIFIED",
+    "metadata": {
+      "documentType": "Business Registration",
+      "businessName": "Singapore Tech Solutions Pte Ltd",
+      "businessType": "Private Limited Company",
+      "registrationDate": "2025-01-25",
+      "address": "123 Innovation Drive, Singapore 123456"
+    },
+    "verificationResult": {
+      "verified": true,
+      "verifiedAt": "2025-01-25T11:00:00Z",
+      "verifiedBy": "did:indy:sovrin:gov123456789abcdefghi1",
+      "score": 0.99
+    },
+    "createdAt": "2025-01-25T10:30:00Z",
+    "updatedAt": "2025-01-25T11:00:00Z",
+    "userId": "11"
+  },
+  {
+    "id": "6",
+    "name": "Health Authority Certificate",
+    "type": "GOVERNMENT_CERTIFICATE",
+    "issuer": "Singapore Government",
+    "issuanceDate": "2025-01-30T14:30:00Z",
+    "expirationDate": "2030-01-30T14:30:00Z",
+    "documentNumber": "MOH-SG-2025-001",
+    "country": "Singapore",
+    "hash": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6",
+    "status": "VERIFIED",
+    "metadata": {
+      "documentType": "Government Authority Certificate",
+      "organizationName": "Singapore Ministry of Health",
+      "authorityType": "Government Health Authority",
+      "jurisdiction": "Singapore",
+      "authorizedSignatory": "Dr. Lee Wei Ling"
+    },
+    "verificationResult": {
+      "verified": true,
+      "verifiedAt": "2025-01-30T15:00:00Z",
+      "verifiedBy": "did:indy:sovrin:gov123456789abcdefghi1",
+      "score": 1.0
+    },
+    "createdAt": "2025-01-30T14:30:00Z",
+    "updatedAt": "2025-01-30T15:00:00Z",
+    "userId": "16"
+  }
+]

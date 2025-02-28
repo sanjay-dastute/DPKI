@@ -1,0 +1,58 @@
+[
+  {
+    "id": "1",
+    "did": "did:indy:sovrin:123456789abcdefghi1",
+    "method": "indy",
+    "network": "sovrin",
+    "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0vx7agoebGcQSuuPiLJX",
+    "privateKey": "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDSXqzMJyQJm+RF",
+    "alias": "John's Primary Identity",
+    "country": "Singapore",
+    "status": "ACTIVE",
+    "createdAt": "2025-01-15T09:00:00Z",
+    "updatedAt": "2025-01-15T09:00:00Z",
+    "userId": "1"
+  },
+  {
+    "id": "6",
+    "did": "did:ethr:rinkeby:0x1234567890abcdef1234567890abcdef12345678",
+    "method": "ethr",
+    "network": "rinkeby",
+    "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0vx7agoebGcQSuuPiLJX",
+    "privateKey": "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDSXqzMJyQJm+RF",
+    "alias": "Emma's Travel Identity",
+    "country": "United Kingdom",
+    "status": "ACTIVE",
+    "createdAt": "2025-01-20T14:30:00Z",
+    "updatedAt": "2025-01-20T14:30:00Z",
+    "userId": "6"
+  },
+  {
+    "id": "11",
+    "did": "did:web:singaporetech.com",
+    "method": "web",
+    "network": "web",
+    "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0vx7agoebGcQSuuPiLJX",
+    "privateKey": "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDSXqzMJyQJm+RF",
+    "alias": "Singapore Tech Corporate Identity",
+    "country": "Singapore",
+    "status": "ACTIVE",
+    "createdAt": "2025-01-25T09:15:00Z",
+    "updatedAt": "2025-01-25T09:15:00Z",
+    "userId": "11"
+  },
+  {
+    "id": "16",
+    "did": "did:indy:sovrin:gov123456789abcdefghi1",
+    "method": "indy",
+    "network": "sovrin",
+    "publicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0vx7agoebGcQSuuPiLJX",
+    "privateKey": "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDSXqzMJyQJm+RF",
+    "alias": "Singapore Ministry of Health",
+    "country": "Singapore",
+    "status": "ACTIVE",
+    "createdAt": "2025-01-30T13:30:00Z",
+    "updatedAt": "2025-01-30T13:30:00Z",
+    "userId": "16"
+  }
+]
