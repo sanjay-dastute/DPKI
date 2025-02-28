@@ -61,7 +61,7 @@ export class Document {
   })
   status: DocumentStatus;
 
-  @Prop({ type: AIVerificationResult })
+  @Prop({ type: () => AIVerificationResult })
   aiVerificationResult: AIVerificationResult;
 
   @Prop()
