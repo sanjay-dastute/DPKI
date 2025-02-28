@@ -16,8 +16,19 @@ import { FabricService } from './services/fabric.service';
 @Injectable()
 export class BlockchainService implements OnModuleInit {
   private readonly logger = new Logger(BlockchainService.name);
-  private provider: ethers.JsonRpcProvider;
-  private wallet: ethers.Wallet;
+  private provider: ethers.JsonRpcProvider | null = null;
+  private wallet: ethers.Wallet | null = null;
+  
+  // Helper method to safely get wallet address
+  private async safeGetWalletAddress(): Promise<string> {
+    if (!this.wallet) return '';
+    try {
+      return await this.wallet.getAddress();
+    } catch (error) {
+      this.logger.warn(`Error getting wallet address: ${error.message}`);
+      return '';
+    }
+  }
 
   constructor(
     private configService: ConfigService,
@@ -221,10 +232,7 @@ export class BlockchainService implements OnModuleInit {
       }
       
       // Get wallet address safely
-      let walletAddress = '';
-      if (this.wallet) {
-        walletAddress = await this.wallet.getAddress();
-      }
+      const walletAddress = await this.safeGetWalletAddress();
       
       return this.ethereumService.sendContractTransaction(
         contractAddress,
@@ -237,10 +245,7 @@ export class BlockchainService implements OnModuleInit {
       this.logger.warn(`Error executing contract method: ${error.message}. Using simulated service.`);
       
       // Get wallet address safely
-      let walletAddress = '';
-      if (this.wallet) {
-        walletAddress = await this.wallet.getAddress();
-      }
+      const walletAddress = await this.safeGetWalletAddress();
       
       return this.ethereumService.sendContractTransaction(
         contractAddress,

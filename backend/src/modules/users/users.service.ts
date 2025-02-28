@@ -23,22 +23,22 @@ export class UsersService {
     return user;
   }
 
-  async findByUsername(username: string): Promise<User> {
+  async findByUsername(username: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { username } });
   }
 
-  async findByEmail(email: string): Promise<User> {
+  async findByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { email } });
   }
 
   async create(userData: Partial<User>): Promise<User> {
     const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(userData.password, salt);
+    const hashedPassword = userData.password ? await bcrypt.hash(userData.password, salt) : '';
     
     const user = this.usersRepository.create({
       ...userData,
       password: hashedPassword,
-    });
+    } as User);
     
     return this.usersRepository.save(user);
   }
