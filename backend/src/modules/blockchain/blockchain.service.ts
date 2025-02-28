@@ -219,7 +219,13 @@ export class BlockchainService implements OnModuleInit {
           transaction: tx,
         };
       }
-      const walletAddress = this.wallet ? await this.wallet.getAddress() : '';
+      
+      // Get wallet address safely
+      let walletAddress = '';
+      if (this.wallet) {
+        walletAddress = await this.wallet.getAddress();
+      }
+      
       return this.ethereumService.sendContractTransaction(
         contractAddress,
         contractABI,
@@ -229,7 +235,13 @@ export class BlockchainService implements OnModuleInit {
       );
     } catch (error) {
       this.logger.warn(`Error executing contract method: ${error.message}. Using simulated service.`);
-      const walletAddress = this.wallet ? await this.wallet.getAddress() : '';
+      
+      // Get wallet address safely
+      let walletAddress = '';
+      if (this.wallet) {
+        walletAddress = await this.wallet.getAddress();
+      }
+      
       return this.ethereumService.sendContractTransaction(
         contractAddress,
         contractABI,
