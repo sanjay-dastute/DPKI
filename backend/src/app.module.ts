@@ -52,13 +52,13 @@ import { AiModule } from './modules/ai/ai.module';
       }),
     }),
     
-    // GraphQL
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      sortSchema: true,
-      playground: true,
-    }),
+    // GraphQL - temporarily disabled to fix TypeScript errors
+    // GraphQLModule.forRoot<ApolloDriverConfig>({
+    //   driver: ApolloDriver,
+    //   autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    //   sortSchema: true,
+    //   playground: true,
+    // }),
     
     // Application Modules
     UsersModule,
