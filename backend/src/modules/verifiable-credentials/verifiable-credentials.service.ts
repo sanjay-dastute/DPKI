@@ -71,7 +71,7 @@ export class VerifiableCredentialsService {
       { id },
       { $set: credential },
       { new: true }
-    ).exec();
+    ).exec() as Promise<VerifiableCredential>;
   }
   
   async issue(
@@ -139,7 +139,7 @@ export class VerifiableCredentialsService {
       { id },
       { $set: { status: CredentialStatus.REVOKED } },
       { new: true }
-    ).exec();
+    ).exec() as Promise<VerifiableCredential>;
   }
 
   private generateProof(issuerDid: string, holderDid: string, claims: Record<string, any>): any {
