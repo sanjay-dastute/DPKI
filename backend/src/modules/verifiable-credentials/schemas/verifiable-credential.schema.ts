@@ -8,55 +8,55 @@ export enum CredentialStatus {
 
 @Schema()
 export class Proof {
-  @Prop({ required: true })
+  @Prop()
   type: string;
 
-  @Prop({ required: true })
+  @Prop()
   created: Date;
 
-  @Prop({ required: true })
+  @Prop()
   proofPurpose: string;
 
-  @Prop({ required: true })
+  @Prop()
   verificationMethod: string;
 
-  @Prop({ required: true })
+  @Prop()
   proofValue: string;
 }
 
 @Schema()
 export class CredentialSubject {
-  @Prop({ required: true })
+  @Prop()
   id: string;
 
-  @Prop({ type: Object, required: true })
+  @Prop({ type: Object })
   claims: Record<string, any>;
 }
 
 @Schema({ timestamps: true })
 export class VerifiableCredential {
-  @Prop({ required: true, unique: true })
+  @Prop({ unique: true })
   id: string;
 
-  @Prop({ required: true })
+  @Prop()
   did: string;
 
-  @Prop({ required: true })
+  @Prop()
   type: string;
 
-  @Prop({ required: true })
+  @Prop()
   issuer: string;
 
-  @Prop({ required: true })
+  @Prop()
   issuanceDate: Date;
 
   @Prop()
   expirationDate: Date;
 
-  @Prop({ type: () => CredentialSubject, required: true })
+  @Prop({ type: () => CredentialSubject })
   credentialSubject: CredentialSubject;
 
-  @Prop({ type: () => Proof, required: true })
+  @Prop({ type: () => Proof })
   proof: Proof;
 
   @Prop({
