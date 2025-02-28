@@ -17,7 +17,7 @@ export enum DocumentType {
 
 @Schema()
 export class AIVerificationResult {
-  @Prop({ required: true })
+  @Prop()
   verified: boolean;
 
   @Prop()
@@ -29,23 +29,22 @@ export class AIVerificationResult {
 
 @Schema({ timestamps: true })
 export class Document {
-  @Prop({ required: true, unique: true })
+  @Prop({ unique: true })
   id: string;
 
-  @Prop({ required: true })
+  @Prop()
   userId: string;
 
-  @Prop({ required: true })
+  @Prop()
   did: string;
 
   @Prop({
     type: String,
     enum: Object.values(DocumentType),
-    required: true,
   })
   type: DocumentType;
 
-  @Prop({ required: true })
+  @Prop()
   hash: string;
 
   @Prop()
