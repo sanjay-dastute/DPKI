@@ -8,107 +8,85 @@ QuantumTrust DPKI is a decentralized public key infrastructure system that repla
 
 The application follows a microservices architecture with the following components:
 
-### Backend Services
+## 1. Core Development Tech Stack
 
-1. **Document Management Service**
-   - Handles document upload, validation, encryption, and IPFS storage
-   - Tech Stack: Node.js (NestJS), Tesseract.js, IPFS
-   - Key Endpoints:
-     - POST /documents/upload
-     - GET /documents/{did}
-     - DELETE /documents/{did}
+### 1.1 Blockchain & Smart Contracts
 
-2. **DID Management Service**
-   - Generates, revokes, and manages DIDs with Hyperledger Indy
-   - Tech Stack: Node.js, Hyperledger Indy/Aries, PostgreSQL
-   - Key Endpoints:
-     - POST /did/create
-     - POST /did/revoke
-     - GET /did/{id}
+| Component | Technology/Platform |
+|-----------|---------------------|
+| Blockchain Framework | Hyperledger Indy (for Decentralized Identity) |
+| Smart Contract Platform | Ethereum (Solidity) & Hyperledger Fabric (Chaincode) |
+| Smart Contract Languages | Solidity (Ethereum), Go (Hyperledger Fabric) |
+| DID & Verifiable Credentials | Hyperledger Aries & Indy SDK |
+| Consensus Mechanism | Proof-of-Stake (PoS) (Ethereum), PBFT (Indy) |
+| Identity Verification | DIDComm (Decentralized Identity Communication) |
+| Regulatory Compliance Ledger | Hedera Hashgraph for GDPR/HIPAA Audit Trail |
 
-3. **VC Issuance Service**
-   - Creates and verifies quantum-resistant Verifiable Credentials
-   - Tech Stack: Python (FastAPI), MongoDB
-   - Key Endpoints:
-     - POST /vc/issue
-     - GET /vc/verify/{id}
-     - GET /vc/list/{did}
+## 2. Backend Development
 
-4. **Compliance Engine**
-   - Enforces PDPA (SG), SDAIA (KSA), and sector-specific regulations
-   - Tech Stack: Node.js, Open Policy Agent (OPA)
-   - Key Endpoints:
-     - POST /compliance/validate
-     - GET /compliance/report
+| Component | Technology/Platform |
+|-----------|---------------------|
+| Backend Framework | Node.js (NestJS for modular architecture) |
+| API Gateway | GraphQL (Apollo Server) |
+| Authentication | OAuth2, OpenID Connect (OIDC), JWT |
+| Data Storage | PostgreSQL (structured), MongoDB (audit logs) |
+| Security & Encryption | AES-256, mTLS, Quantum-Resistant CRYSTALS-Kyber |
+| Caching | Redis (for fast identity lookups) |
+| Containerization | Docker |
+| Event Streaming | Apache Kafka (for real-time credential issuance & updates) |
 
-5. **User Management Service**
-   - Manages user roles and access control
-   - Tech Stack: Node.js (NestJS), PostgreSQL
-   - Key Endpoints:
-     - POST /users/register
-     - POST /users/login
-     - GET /users/profile
-     - PUT /users/update
-     - GET /users/list (admin only)
+## 3. AI/ML Integration
 
-6. **Domain Validation Service**
-   - Validates domain ownership using ZKP or DNS TXT records
-   - Tech Stack: Node.js (NestJS)
-   - Key Endpoints:
-     - POST /domain/initiate
-     - POST /domain/verify
-     - POST /domain/vc/issue
+| Component | Technology/Platform |
+|-----------|---------------------|
+| AI/ML Framework | Python Django (FastAPI for microservices) |
+| Zero-Knowledge Proofs (ZKP) | ZoKrates (for proving identity without revealing data) |
+| AI-Powered Anomaly Detection | TensorFlow/PyTorch |
+| Explainable AI (XAI) for Compliance | LIME (Local Interpretable Model-agnostic Explanations) |
+| AI Ethics & Fairness Audits | IBM AI Fairness 360 (AIF360) |
+| Document Verification (OCR + NLP) | Tesseract OCR + spaCy/NLTK |
+| Fraud Detection in Identity Verification | Deep Learning models (LSTMs, GANs) |
 
-7. **Admin Service**
-   - Provides administrative capabilities for system management
-   - Tech Stack: Node.js (NestJS), PostgreSQL
-   - Key Endpoints:
-     - GET /admin/users
-     - PUT /admin/users/{id}
-     - GET /admin/logs
-     - GET /admin/stats
+## 4. Frontend Development
 
-### Frontend Components
+| Component | Technology/Platform |
+|-----------|---------------------|
+| Frontend Framework | React.js + Next.js |
+| State Management | Redux Toolkit |
+| Authentication | DID-based SSO, OAuth2 |
+| Wallet Integration | Metamask, Ledger, SSI Wallet (Hyperledger Aries) |
+| Data Visualization | D3.js / Chart.js for compliance analytics |
+| Web3 Integration | ethers.js (for Ethereum interaction) |
+| User Dashboard | React Admin Panel (Material UI/Tailwind) |
 
-1. **User Portal**
-   - Document upload and management
-   - DID/VC management
-   - Domain validation
-   - Tech Stack: React.js, Material-UI, Web3.js
+## 5. Security & Compliance
 
-2. **Admin Dashboard**
-   - User management
-   - System monitoring
-   - Compliance reporting
-   - Tech Stack: React.js, Material-UI, Recharts
+| Security Layer | Technology Used |
+|----------------|-----------------|
+| End-to-End Encryption | AES-256, Quantum-Resistant TLS 1.3 |
+| DID-Based Authentication | Hyperledger Indy & Aries |
+| Consent Ledger for GDPR Compliance | Hedera Hashgraph |
+| Zero-Knowledge Proofs for Data Privacy | ZoKrates, Circom |
+| Role-Based Access Control (RBAC) | AWS IAM, ABAC |
+| Multi-Factor Authentication (MFA) | WebAuthn, FIDO2 |
+| Immutable Audit Logs | Hyperledger Fabric & MongoDB |
 
-### Database Layer
+## 6. Microservices & APIs
 
-1. **PostgreSQL**
-   - User accounts and profiles
-   - DID metadata
-   - Audit logs
+### 6.1 Microservices Architecture
 
-2. **MongoDB**
-   - Document metadata
-   - Verifiable Credentials
-   - Domain validation records
+| Service | Tech Stack |
+|---------|------------|
+| DID Manager | Node.js (NestJS) |
+| Verifiable Credential Issuer | Node.js (Express) |
+| Smart Contract Executor | Node.js (web3.js, ethers.js) |
+| AI-Powered Anomaly Detection | Python (Django, TensorFlow) |
+| Compliance Auditor | Python (Django + Hyperledger SDK) |
+| Document Verification | Python (Django + OpenCV, Tesseract) |
 
-### Security Layer
+## 7. Data Models
 
-1. **Authentication & Authorization**
-   - JWT-based authentication
-   - Role-based access control (RBAC)
-   - Attribute-based access control (ABAC) via OPA
-
-2. **Encryption**
-   - AES-256 for data at rest
-   - TLS 1.3 with CRYSTALS-Kyber for communication
-   - CRYSTALS-Dilithium for digital signatures
-
-## Data Models
-
-### User Model
+### 7.1 User Model
 ```json
 {
   "id": "uuid",
@@ -118,25 +96,28 @@ The application follows a microservices architecture with the following componen
   "role": "enum(citizen, tourist, business, government, admin)",
   "country": "string",
   "did": "string",
+  "walletAddress": "string",
   "createdAt": "timestamp",
   "updatedAt": "timestamp"
 }
 ```
 
-### DID Model
+### 7.2 DID Model
 ```json
 {
   "id": "string",
   "userId": "uuid",
   "publicKey": "string",
   "status": "enum(active, revoked)",
+  "method": "string",
+  "controller": "string",
   "createdAt": "timestamp",
   "updatedAt": "timestamp",
   "expiresAt": "timestamp"
 }
 ```
 
-### Document Model
+### 7.3 Document Model
 ```json
 {
   "id": "uuid",
@@ -145,14 +126,16 @@ The application follows a microservices architecture with the following componen
   "type": "enum(passport, nric, business_license, etc)",
   "hash": "string",
   "ipfsHash": "string",
+  "encryptionMethod": "string",
   "status": "enum(pending, verified, rejected)",
+  "aiVerificationResult": "json",
   "createdAt": "timestamp",
   "updatedAt": "timestamp",
   "expiresAt": "timestamp"
 }
 ```
 
-### Verifiable Credential Model
+### 7.4 Verifiable Credential Model
 ```json
 {
   "id": "uuid",
@@ -162,14 +145,20 @@ The application follows a microservices architecture with the following componen
   "issuanceDate": "timestamp",
   "expirationDate": "timestamp",
   "credentialSubject": "json",
-  "proof": "json",
+  "proof": {
+    "type": "CRYSTALS-Dilithium",
+    "created": "timestamp",
+    "proofPurpose": "assertionMethod",
+    "verificationMethod": "string",
+    "proofValue": "string"
+  },
   "status": "enum(active, revoked)",
   "createdAt": "timestamp",
   "updatedAt": "timestamp"
 }
 ```
 
-### Domain Validation Model
+### 7.5 Domain Validation Model
 ```json
 {
   "id": "uuid",
@@ -177,6 +166,7 @@ The application follows a microservices architecture with the following componen
   "domain": "string",
   "challenge": "string",
   "validationMethod": "enum(zkp, dns)",
+  "zkProof": "json",
   "status": "enum(pending, verified, rejected)",
   "createdAt": "timestamp",
   "updatedAt": "timestamp",
@@ -184,39 +174,60 @@ The application follows a microservices architecture with the following componen
 }
 ```
 
-## User Types and Workflows
+### 7.6 Smart Contract Model
+```json
+{
+  "id": "uuid",
+  "address": "string",
+  "blockchain": "enum(ethereum, hyperledger)",
+  "abi": "json",
+  "bytecode": "string",
+  "deployedBy": "uuid",
+  "status": "enum(active, inactive)",
+  "createdAt": "timestamp",
+  "updatedAt": "timestamp"
+}
+```
 
-### Individual Citizen
-1. Register and login
+## 8. User Types and Workflows
+
+### 8.1 Individual Citizen
+1. Register and login with DID-based SSO
 2. Upload required documents (NRIC, proof of residency)
-3. Receive DID and VCs
-4. Manage documents and credentials
+3. AI/ML verification of document authenticity
+4. Receive DID and quantum-resistant VCs
+5. Manage documents and credentials via SSI wallet
+6. Control consent for data sharing with ZKPs
 
-### Tourist
-1. Register and login
+### 8.2 Tourist
+1. Register and login with passport-based verification
 2. Upload required documents (Passport, eVisa)
-3. Receive temporary DID and VCs
-4. Access services during visit
+3. Receive temporary DID and time-bound VCs
+4. Access services during visit via mobile wallet
+5. Automatic credential revocation upon visa expiry
 
-### Business Entity
-1. Register and login
+### 8.3 Business Entity
+1. Register and login with multi-sig authentication
 2. Upload required documents (Business registration, licenses)
-3. Receive business DID and VCs
-4. Manage employee verification
+3. Smart contract verification with government registries
+4. Receive business DID and role-based VCs for employees
+5. Manage employee verification and access control
 
-### Government Entity
-1. Login with special government credentials
-2. Access audit dashboard
-3. Issue public-sector VCs
-4. Revoke compromised DIDs
+### 8.4 Government Entity
+1. Login with special government credentials and MFA
+2. Access audit dashboard with real-time analytics
+3. Issue public-sector VCs with quantum-resistant signatures
+4. Revoke compromised DIDs via consensus mechanism
+5. Generate compliance reports for regulatory bodies
 
-### Admin
-1. Login with admin credentials
+### 8.5 Admin
+1. Login with admin credentials and hardware-based MFA
 2. Manage users and system settings
-3. View audit logs and compliance reports
-4. Monitor system performance
+3. View immutable audit logs and compliance reports
+4. Monitor system performance and security metrics
+5. Manage smart contracts and blockchain parameters
 
-## Sample Data
+## 9. Sample Data
 
 The system will be preloaded with 20 sample users across all categories:
 - 5 Individual Citizens
@@ -227,14 +238,16 @@ The system will be preloaded with 20 sample users across all categories:
 
 Each user will have appropriate sample documents, DIDs, and VCs based on their user type and country.
 
-## Deployment Architecture
+## 10. Local Development Architecture
 
 For local development and testing:
 - Docker containers for each microservice
 - Docker Compose for orchestration
 - Local PostgreSQL and MongoDB instances
+- Local Hyperledger Indy network
+- Local Ethereum development network (Ganache)
 
-## Ownership and License
+## 11. Ownership and License
 
 This project is owned by:
 SANJAY K R - Founder & CEO of Dastute Switcher Technologies LLP
