@@ -16,7 +16,7 @@ import { FabricService } from './services/fabric.service';
 @Injectable()
 export class BlockchainService implements OnModuleInit {
   private readonly logger = new Logger(BlockchainService.name);
-  private provider: ethers.providers.JsonRpcProvider;
+  private provider: ethers.JsonRpcProvider;
   private wallet: ethers.Wallet;
 
   constructor(
@@ -33,7 +33,7 @@ export class BlockchainService implements OnModuleInit {
       // Initialize Ethereum provider
       const rpcUrl = this.configService.get<string>('blockchain.ethereum.rpcUrl');
       if (rpcUrl) {
-        this.provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+        this.provider = new ethers.JsonRpcProvider(rpcUrl);
         
         // Initialize wallet if private key is provided
         const privateKey = this.configService.get<string>('blockchain.ethereum.privateKey');
@@ -128,7 +128,7 @@ export class BlockchainService implements OnModuleInit {
     try {
       if (this.provider) {
         const balance = await this.provider.getBalance(address);
-        return ethers.utils.formatEther(balance);
+        return ethers.formatEther(balance);
       }
       return this.ethereumService.getBalance(address);
     } catch (error) {
@@ -148,10 +148,11 @@ export class BlockchainService implements OnModuleInit {
       if (this.wallet) {
         const factory = new ethers.ContractFactory(contractABI, contractBytecode, this.wallet);
         const contract = await factory.deploy(...constructorArgs);
-        await contract.deployed();
+        await contract.waitForDeployment();
+        const deployTx = contract.deploymentTransaction();
         return {
-          contractAddress: contract.address,
-          transactionHash: contract.deployTransaction.hash,
+          contractAddress: await contract.getAddress(),
+          transactionHash: deployTx ? deployTx.hash : '',
           contract,
         };
       }
@@ -218,21 +219,23 @@ export class BlockchainService implements OnModuleInit {
           transaction: tx,
         };
       }
+      const walletAddress = this.wallet ? await this.wallet.getAddress() : '';
       return this.ethereumService.sendContractTransaction(
         contractAddress,
         contractABI,
         methodName,
         methodArgs,
-        this.wallet ? this.wallet.address : '',
+        walletAddress,
       );
     } catch (error) {
       this.logger.warn(`Error executing contract method: ${error.message}. Using simulated service.`);
+      const walletAddress = this.wallet ? await this.wallet.getAddress() : '';
       return this.ethereumService.sendContractTransaction(
         contractAddress,
         contractABI,
         methodName,
         methodArgs,
-        this.wallet ? this.wallet.address : '',
+        walletAddress,
       );
     }
   }
@@ -305,7 +308,7 @@ export class BlockchainService implements OnModuleInit {
   async verifySignature(message: string, signature: string, address: string): Promise<boolean> {
     try {
       if (ethers) {
-        const recoveredAddress = ethers.utils.verifyMessage(message, signature);
+        const recoveredAddress = ethers.verifyMessage(message, signature);
         return recoveredAddress.toLowerCase() === address.toLowerCase();
       }
       return this.ethereumService.verifySignature(message, signature, address);
