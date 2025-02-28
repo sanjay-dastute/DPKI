@@ -24,6 +24,10 @@ export class DIDService {
     }
     return did;
   }
+  
+  async findOne(id: string): Promise<DID> {
+    return this.findById(id);
+  }
 
   async findByDID(did: string): Promise<DID> {
     const didEntity = await this.didRepository.findOne({ where: { did } });
