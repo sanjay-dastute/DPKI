@@ -4,8 +4,8 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/store';
-import { logout } from '@/store/slices/authSlice';
+import { RootState } from '../../store';
+import { logout } from '../../store/slices/authSlice';
 
 const Navbar: React.FC = () => {
   const pathname = usePathname();
