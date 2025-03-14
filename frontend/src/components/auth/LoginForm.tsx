@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { login, clearError } from '@/store/slices/authSlice';
-import { AppDispatch, RootState } from '@/store';
+import { login, clearError } from '../../store/slices/authSlice';
+import { AppDispatch, RootState } from '../../store';
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');

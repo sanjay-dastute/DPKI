@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { register, clearError } from '@/store/slices/authSlice';
-import { AppDispatch, RootState } from '@/store';
+import { register, clearError } from '../../store/slices/authSlice';
+import { AppDispatch, RootState } from '../../store';
 
 const RegisterForm: React.FC = () => {
   const [formData, setFormData] = useState({
