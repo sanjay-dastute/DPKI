@@ -13,7 +13,7 @@ const LoginForm: React.FC = () => {
   const [directLoginError, setDirectLoginError] = useState<string | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { loading, error, isAuthenticated, user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     // Check if we already have a token in localStorage
