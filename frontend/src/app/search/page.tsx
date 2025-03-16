@@ -11,7 +11,7 @@ export default function SearchPage() {
   const { user, isAuthenticated, loading } = useSelector((state: RootState) => state.auth);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchType, setSearchType] = useState('did');
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState('');
 
