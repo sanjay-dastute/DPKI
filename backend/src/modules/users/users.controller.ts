@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ForbiddenException, Put } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -30,8 +30,55 @@ export class UsersController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  update(@Param('id') id: string, @Body() updateUserDto: Partial<User>) {
-    return this.usersService.update(id, updateUserDto);
+  patch(@Param('id') id: string, @Body() updateUserDto: Partial<User>, @Request() req: any) {
+    // Check if user is updating their own profile or is an admin
+    if (req.user.id !== id && req.user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('You are not authorized to update this user');
+    }
+    
+    // Create a safe update object
+    const safeUpdateData: Partial<User> = {
+      username: updateUserDto.username,
+      email: updateUserDto.email,
+      country: updateUserDto.country,
+      walletAddress: updateUserDto.walletAddress,
+    };
+    
+    // Only admins can update these fields
+    if (req.user.role === UserRole.ADMIN) {
+      if (updateUserDto.role) safeUpdateData.role = updateUserDto.role;
+      if (updateUserDto.isActive !== undefined) safeUpdateData.isActive = updateUserDto.isActive;
+      if (updateUserDto.isVerified !== undefined) safeUpdateData.isVerified = updateUserDto.isVerified;
+      if (updateUserDto.approvalStatus) safeUpdateData.approvalStatus = updateUserDto.approvalStatus;
+    }
+    
+    return this.usersService.update(id, safeUpdateData);
+  }
+  
+  @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  async update(@Param('id') id: string, @Body() updateUserDto: any, @Request() req: any): Promise<User> {
+    // Check if user is updating their own profile or is an admin
+    if (req.user.id !== id && req.user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('You are not authorized to update this user');
+    }
+    
+    // Create a safe update object
+    const safeUpdateData: Partial<User> = {
+      fullName: updateUserDto.fullName,
+      country: updateUserDto.country,
+      organization: updateUserDto.organization,
+    };
+    
+    // Only admins can update these fields
+    if (req.user.role === UserRole.ADMIN) {
+      if (updateUserDto.role) safeUpdateData.role = updateUserDto.role;
+      if (updateUserDto.isActive !== undefined) safeUpdateData.isActive = updateUserDto.isActive;
+      if (updateUserDto.isVerified !== undefined) safeUpdateData.isVerified = updateUserDto.isVerified;
+      if (updateUserDto.approvalStatus) safeUpdateData.approvalStatus = updateUserDto.approvalStatus;
+    }
+    
+    return this.usersService.update(id, safeUpdateData);
   }
 
   @Delete(':id')
