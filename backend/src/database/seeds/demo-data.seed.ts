@@ -46,15 +46,15 @@ export class DemoDataSeeder {
     this.logger.log('Demo data seeding completed successfully!');
   }
 
-  async clearExistingData() {
+  private async clearExistingData(): Promise<void> {
     this.logger.log('Clearing existing demo data...');
-    await this.userModel.deleteMany({ email: { $regex: /^demo/ } });
-    await this.didModel.deleteMany({ name: { $regex: /^Demo/ } });
-    await this.vcModel.deleteMany({ type: { $in: ['DemoCredential'] } });
-    await this.documentModel.deleteMany({ name: { $regex: /^Demo/ } });
+    await this.userRepository.delete({ email: Like('demo%') });
+    await this.didRepository.delete({ did: Like('did:demo%') });
+    await this.vcModel.deleteMany({ 'type.1': 'DemoCredential' }).exec();
+    await this.documentModel.deleteMany({ name: /^Demo/ }).exec();
   }
 
-  async createDemoUsers() {
+  private async createDemoUsers(): Promise<User[]> {
     this.logger.log('Creating demo users...');
     
     const demoUsers = [
@@ -62,58 +62,44 @@ export class DemoDataSeeder {
         username: 'demo_individual',
         email: 'demo_individual@example.com',
         password: await bcrypt.hash('Password123!', 10),
-        role: 'individual',
+        role: UserRole.INDIVIDUAL,
         country: 'Singapore',
-        firstName: 'John',
-        lastName: 'Doe',
-        phoneNumber: '+6512345678',
       },
       {
         username: 'demo_business',
         email: 'demo_business@example.com',
         password: await bcrypt.hash('Password123!', 10),
-        role: 'business',
+        role: UserRole.BUSINESS,
         country: 'Singapore',
-        firstName: 'Jane',
-        lastName: 'Smith',
-        phoneNumber: '+6587654321',
-        businessName: 'Demo Corp Pte Ltd',
-        businessRegistrationNumber: 'UEN202312345R',
       },
       {
         username: 'demo_government',
         email: 'demo_government@example.com',
         password: await bcrypt.hash('Password123!', 10),
-        role: 'government',
+        role: UserRole.GOVERNMENT,
         country: 'Singapore',
-        firstName: 'Admin',
-        lastName: 'User',
-        phoneNumber: '+6590001111',
-        department: 'Ministry of Digital Development',
-        employeeId: 'GOV-12345',
       },
       {
         username: 'demo_tourist',
         email: 'demo_tourist@example.com',
         password: await bcrypt.hash('Password123!', 10),
-        role: 'tourist',
+        role: UserRole.TOURIST,
         country: 'Saudi Arabia',
-        firstName: 'Mohammed',
-        lastName: 'Al-Farsi',
-        phoneNumber: '+966501234567',
-        passportNumber: 'SA12345678',
-        visaNumber: 'V123456789SG',
       },
     ];
 
-    const createdUsers = [];
+    const createdUsers: User[] = [];
+    
     for (const userData of demoUsers) {
-      const existingUser = await this.userModel.findOne({ email: userData.email });
+      const existingUser = await this.userRepository.findOne({ 
+        where: { email: userData.email } 
+      });
+      
       if (existingUser) {
         createdUsers.push(existingUser);
       } else {
-        const newUser = new this.userModel(userData);
-        await newUser.save();
+        const newUser = this.userRepository.create(userData);
+        await this.userRepository.save(newUser);
         createdUsers.push(newUser);
       }
     }
@@ -122,44 +108,35 @@ export class DemoDataSeeder {
     return createdUsers;
   }
 
-  async createDemoDIDs(users) {
+  private async createDemoDIDs(users: User[]): Promise<DID[]> {
     this.logger.log('Creating demo DIDs...');
     
     const didMethods = ['ethereum', 'indy', 'fabric'];
-    const blockchains = ['ethereum', 'hyperledger-indy', 'hyperledger-fabric'];
-    
-    const createdDIDs = [];
+    const createdDIDs: DID[] = [];
     
     for (let i = 0; i < users.length; i++) {
       const user = users[i];
       const methodIndex = i % didMethods.length;
+      const method = didMethods[methodIndex];
       
-      // Create one DID for each user
       const didData = {
-        name: `Demo ${didMethods[methodIndex]} DID for ${user.username}`,
-        description: `A demo DID created for demonstration purposes using ${didMethods[methodIndex]}`,
-        method: didMethods[methodIndex],
-        controller: user._id,
-        blockchain: blockchains[methodIndex],
-        network: didMethods[methodIndex] === 'ethereum' ? 'sepolia' : 'testnet',
-        country: user.country,
-        did: `did:${didMethods[methodIndex]}:${this.generateRandomHex(32)}`,
-        verkey: this.generateRandomHex(32),
-        alias: `demo-${user.username}-${didMethods[methodIndex]}`,
-        blockchainTxHash: `0x${this.generateRandomHex(64)}`,
-        transactionId: `0x${this.generateRandomHex(64)}`,
+        did: `did:${method}:demo:${this.generateRandomHex(16)}`,
+        userId: user.id,
+        publicKey: this.generateRandomHex(64),
+        status: DIDStatus.ACTIVE,
+        method,
+        controller: user.id,
       };
       
-      const existingDID = await this.didModel.findOne({ 
-        controller: user._id, 
-        method: didMethods[methodIndex] 
+      const existingDID = await this.didRepository.findOne({ 
+        where: { userId: user.id, method } 
       });
       
       if (existingDID) {
         createdDIDs.push(existingDID);
       } else {
-        const newDID = new this.didModel(didData);
-        await newDID.save();
+        const newDID = this.didRepository.create(didData);
+        await this.didRepository.save(newDID);
         createdDIDs.push(newDID);
       }
     }
