@@ -45,9 +45,10 @@ export class AuthController {
         registerDto.role = 'INDIVIDUAL';
       }
       
-      // Set default values for isActive and isVerified
-      registerDto.isActive = true;
+      // Set default values for isActive, isVerified, and approvalStatus
+      registerDto.isActive = false;
       registerDto.isVerified = false;
+      registerDto.approvalStatus = 'pending';
       
       const user = await this.usersService.create(registerDto);
       

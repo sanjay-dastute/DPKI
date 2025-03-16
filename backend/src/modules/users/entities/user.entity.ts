@@ -38,6 +38,15 @@ export class User {
   @Column({ nullable: true })
   walletAddress: string;
 
+  @Column({ default: false })
+  isActive: boolean;
+
+  @Column({ default: false })
+  isVerified: boolean;
+
+  @Column({ default: 'pending', enum: ['pending', 'approved', 'disapproved'] })
+  approvalStatus: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
