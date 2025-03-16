@@ -1,36 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Like } from 'typeorm';
+import { User, UserRole } from '../../modules/users/entities/user.entity';
+import { DID, DIDStatus } from '../../modules/did/entities/did.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from '../../modules/users/schemas/user.schema';
-import { DID } from '../../modules/did/schemas/did.schema';
 import { Document } from '../../modules/documents/schemas/document.schema';
 import { VerifiableCredential } from '../../modules/verifiable-credentials/schemas/verifiable-credential.schema';
-import { DIDService } from '../../modules/did/did.service';
-import { VerifiableCredentialsService } from '../../modules/verifiable-credentials/verifiable-credentials.service';
-import { DocumentsService } from '../../modules/documents/documents.service';
-import { BlockchainService } from '../../modules/blockchain/blockchain.service';
-import { IPFSService } from '../../modules/documents/services/ipfs.service';
-import { EncryptionService } from '../../modules/documents/services/encryption.service';
-import * as fs from 'fs';
-import * as path from 'path';
 import * as bcrypt from 'bcrypt';
-import { Logger } from '@nestjs/common';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class DemoDataSeeder {
   private readonly logger = new Logger(DemoDataSeeder.name);
 
   constructor(
-    @InjectModel(User.name) private userModel: Model<User>,
-    @InjectModel(DID.name) private didModel: Model<DID>,
-    @InjectModel(Document.name) private documentModel: Model<Document>,
-    @InjectModel(VerifiableCredential.name) private vcModel: Model<VerifiableCredential>,
-    private didService: DIDService,
-    private verifiableCredentialsService: VerifiableCredentialsService,
-    private documentsService: DocumentsService,
-    private blockchainService: BlockchainService,
-    private ipfsService: IPFSService,
-    private encryptionService: EncryptionService,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(DID)
+    private readonly didRepository: Repository<DID>,
+    @InjectModel(Document.name)
+    private readonly documentModel: Model<Document>,
+    @InjectModel(VerifiableCredential.name)
+    private readonly vcModel: Model<VerifiableCredential>,
   ) {}
 
   async seed() {
