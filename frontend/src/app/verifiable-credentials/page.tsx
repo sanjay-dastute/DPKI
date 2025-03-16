@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/store';
 import { fetchMyCredentials, createCredential, deleteCredential, verifyCredential } from '@/store/slices/vcSlice';
-import type { VerifiableCredential } from '@/types/verifiable-credential';
+import type { VerifiableCredential } from '../../types/verifiable-credential';
 import { fetchMyDIDs } from '@/store/slices/didSlice';
 import Layout from '@/components/layout/Layout';
 

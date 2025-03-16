@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { RootState } from '..';
-import type { VerifiableCredential } from '@/types/verifiable-credential';
+import type { VerifiableCredential } from '../../types/verifiable-credential';
 
 // Define state interface
 
@@ -161,9 +161,9 @@ const vcSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchMyCredentials.fulfilled, (state, action: PayloadAction<VerifiableCredential[]>) => {
+      .addCase(fetchMyCredentials.fulfilled, (state, action: any) => {
         state.loading = false;
-        state.credentials = action.payload;
+        state.credentials = action.payload as VerifiableCredential[];
       })
       .addCase(fetchMyCredentials.rejected, (state, action) => {
         state.loading = false;
@@ -174,9 +174,9 @@ const vcSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchMyIssuedCredentials.fulfilled, (state, action: PayloadAction<VerifiableCredential[]>) => {
+      .addCase(fetchMyIssuedCredentials.fulfilled, (state, action: any) => {
         state.loading = false;
-        state.issuedCredentials = action.payload;
+        state.issuedCredentials = action.payload as VerifiableCredential[];
       })
       .addCase(fetchMyIssuedCredentials.rejected, (state, action) => {
         state.loading = false;
@@ -187,10 +187,11 @@ const vcSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(createCredential.fulfilled, (state, action: PayloadAction<VerifiableCredential>) => {
+      .addCase(createCredential.fulfilled, (state, action: any) => {
         state.loading = false;
-        state.issuedCredentials.push(action.payload);
-        state.currentCredential = action.payload;
+        const credential = action.payload as VerifiableCredential;
+        state.issuedCredentials.push(credential);
+        state.currentCredential = credential;
       })
       .addCase(createCredential.rejected, (state, action) => {
         state.loading = false;
