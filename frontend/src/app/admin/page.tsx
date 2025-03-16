@@ -18,6 +18,7 @@ export default function AdminPage() {
   const [documents, setDocuments] = useState([]);
   const [adminLoading, setAdminLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     if (!isAuthenticated && !loading) {
@@ -34,6 +35,98 @@ export default function AdminPage() {
     }
   }, [isAuthenticated, loading, dispatch, router, user, activeTab]);
 
+  const handleApproveUser = async (userId: string) => {
+    setError('');
+    setSuccess('');
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:3000/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ approvalStatus: 'approved', isActive: true }),
+      });
+      
+      if (response.ok) {
+        // Update the user in the local state
+        setUsers(users.map(user => 
+          user.id === userId 
+            ? { ...user, approvalStatus: 'approved', isActive: true } 
+            : user
+        ));
+        setSuccess(`User ${userId} has been approved and activated`);
+      } else {
+        throw new Error('Failed to approve user');
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred while approving user');
+    }
+  };
+  
+  const handleDisapproveUser = async (userId: string) => {
+    setError('');
+    setSuccess('');
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:3000/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ approvalStatus: 'disapproved', isActive: false }),
+      });
+      
+      if (response.ok) {
+        // Update the user in the local state
+        setUsers(users.map(user => 
+          user.id === userId 
+            ? { ...user, approvalStatus: 'disapproved', isActive: false } 
+            : user
+        ));
+        setSuccess(`User ${userId} has been disapproved and deactivated`);
+      } else {
+        throw new Error('Failed to disapprove user');
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred while disapproving user');
+    }
+  };
+  
+  const handleToggleUserActive = async (userId: string, isActive: boolean) => {
+    setError('');
+    setSuccess('');
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:3000/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isActive }),
+      });
+      
+      if (response.ok) {
+        // Update the user in the local state
+        setUsers(users.map(user => 
+          user.id === userId 
+            ? { ...user, isActive } 
+            : user
+        ));
+        setSuccess(`User ${userId} has been ${isActive ? 'activated' : 'deactivated'}`);
+      } else {
+        throw new Error(`Failed to ${isActive ? 'activate' : 'deactivate'} user`);
+      }
+    } catch (err: any) {
+      setError(err.message || `An error occurred while ${isActive ? 'activating' : 'deactivating'} user`);
+    }
+  };
   const fetchData = async (tab: string) => {
     setAdminLoading(true);
     setError('');
@@ -116,11 +209,12 @@ export default function AdminPage() {
 
   // For demo purposes, we'll use mock data
   const mockUsers = [
-    { id: '1', username: 'admin', email: 'admin@example.com', role: 'ADMIN', country: 'Singapore', isActive: true },
-    { id: '2', username: 'user1', email: 'user1@example.com', role: 'USER', country: 'Singapore', isActive: true },
-    { id: '3', username: 'user2', email: 'user2@example.com', role: 'USER', country: 'Saudi Arabia', isActive: true },
-    { id: '4', username: 'business1', email: 'business1@example.com', role: 'BUSINESS', country: 'Singapore', isActive: true },
-    { id: '5', username: 'gov1', email: 'gov1@example.com', role: 'GOVERNMENT', country: 'Saudi Arabia', isActive: true },
+    { id: '1', username: 'admin', email: 'admin@example.com', role: 'ADMIN', country: 'Singapore', isActive: true, approvalStatus: 'approved' },
+    { id: '2', username: 'user1', email: 'user1@example.com', role: 'USER', country: 'Singapore', isActive: true, approvalStatus: 'approved' },
+    { id: '3', username: 'user2', email: 'user2@example.com', role: 'USER', country: 'Saudi Arabia', isActive: true, approvalStatus: 'approved' },
+    { id: '4', username: 'business1', email: 'business1@example.com', role: 'BUSINESS', country: 'Singapore', isActive: true, approvalStatus: 'approved' },
+    { id: '5', username: 'gov1', email: 'gov1@example.com', role: 'GOVERNMENT', country: 'Saudi Arabia', isActive: false, approvalStatus: 'pending' },
+    { id: '6', username: 'newuser', email: 'newuser@example.com', role: 'USER', country: 'Singapore', isActive: false, approvalStatus: 'pending' },
   ];
 
   const mockDids = [
@@ -226,6 +320,12 @@ export default function AdminPage() {
               <span className="block sm:inline">{error}</span>
             </div>
           )}
+          
+          {success && (
+            <div className="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+              <span className="block sm:inline">{success}</span>
+            </div>
+          )}
 
           <div className="mt-6">
             {adminLoading ? (
@@ -289,8 +389,24 @@ export default function AdminPage() {
                               )}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <button className="text-blue-600 hover:text-blue-900 mr-2">Edit</button>
-                              <button className="text-red-600 hover:text-red-900">Delete</button>
+                              <button 
+                                onClick={() => handleApproveUser(user.id)}
+                                className="text-green-600 hover:text-green-900 mr-2"
+                              >
+                                Approve
+                              </button>
+                              <button 
+                                onClick={() => handleDisapproveUser(user.id)}
+                                className="text-red-600 hover:text-red-900 mr-2"
+                              >
+                                Disapprove
+                              </button>
+                              <button 
+                                onClick={() => handleToggleUserActive(user.id, !user.isActive)}
+                                className="text-blue-600 hover:text-blue-900 mr-2"
+                              >
+                                {user.isActive ? 'Deactivate' : 'Activate'}
+                              </button>
                             </td>
                           </tr>
                         ))}
