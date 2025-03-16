@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ethers } from 'ethers';
+import * as ethers from 'ethers';
 import { IndyService } from './services/indy.service';
 import { EthereumService } from './services/ethereum.service';
 import { FabricService } from './services/fabric.service';
@@ -16,7 +16,7 @@ import { FabricService } from './services/fabric.service';
 @Injectable()
 export class BlockchainService implements OnModuleInit {
   private readonly logger = new Logger(BlockchainService.name);
-  private provider: ethers.JsonRpcProvider | null = null;
+  private provider: ethers.providers.JsonRpcProvider | null = null;
   private wallet: ethers.Wallet | null = null;
   
   // Helper method to safely get wallet address
@@ -44,7 +44,7 @@ export class BlockchainService implements OnModuleInit {
       // Initialize Ethereum provider
       const rpcUrl = this.configService.get<string>('blockchain.ethereum.rpcUrl');
       if (rpcUrl) {
-        this.provider = new ethers.JsonRpcProvider(rpcUrl);
+        this.provider = new ethers.providers.JsonRpcProvider(rpcUrl);
         
         // Initialize wallet if private key is provided
         const privateKey = this.configService.get<string>('blockchain.ethereum.privateKey');
@@ -139,7 +139,7 @@ export class BlockchainService implements OnModuleInit {
     try {
       if (this.provider) {
         const balance = await this.provider.getBalance(address);
-        return ethers.formatEther(balance);
+        return ethers.utils.formatEther(balance);
       }
       return this.ethereumService.getBalance(address);
     } catch (error) {
@@ -325,7 +325,7 @@ export class BlockchainService implements OnModuleInit {
   async verifySignature(message: string, signature: string, address: string): Promise<boolean> {
     try {
       if (ethers) {
-        const recoveredAddress = ethers.verifyMessage(message, signature);
+        const recoveredAddress = ethers.utils.verifyMessage(message, signature);
         return recoveredAddress.toLowerCase() === address.toLowerCase();
       }
       return this.ethereumService.verifySignature(message, signature, address);
