@@ -145,7 +145,7 @@ export class DemoDataSeeder {
     return createdDIDs;
   }
 
-  async createDemoCredentials(dids, users) {
+  private async createDemoCredentials(dids: DID[], users: User[]): Promise<void> {
     this.logger.log('Creating demo credentials...');
     
     const credentialTypes = [
@@ -155,25 +155,34 @@ export class DemoDataSeeder {
       'VisaCredential',
     ];
     
-    const createdCredentials = [];
-    
     // Government user issues credentials to other users
-    const issuerDID = dids.find(did => did.controller.toString() === users[2]._id.toString());
+    const issuerDID = dids.find(did => 
+      did.userId === users.find(u => u.role === UserRole.GOVERNMENT)?.id
+    );
+    
+    if (!issuerDID) {
+      this.logger.warn('No government user found to issue credentials');
+      return;
+    }
+    
+    let createdCount = 0;
     
     for (let i = 0; i < users.length; i++) {
-      if (i === 2) continue; // Skip government user (issuer)
+      if (users[i].role === UserRole.GOVERNMENT) continue; // Skip government user (issuer)
       
       const user = users[i];
-      const holderDID = dids.find(did => did.controller.toString() === user._id.toString());
+      const holderDID = dids.find(did => did.userId === user.id);
+      
+      if (!holderDID) continue;
       
       // Create a credential for each user
       const credentialType = credentialTypes[i % credentialTypes.length];
       
-      let credentialSubject;
+      let credentialSubject: any = {};
       switch (credentialType) {
         case 'IdentityCredential':
           credentialSubject = {
-            name: `${user.firstName} ${user.lastName}`,
+            name: user.username,
             dateOfBirth: '1990-01-01',
             nationality: user.country,
             idNumber: `ID${this.generateRandomHex(8)}`,
@@ -181,7 +190,7 @@ export class DemoDataSeeder {
           break;
         case 'EducationCredential':
           credentialSubject = {
-            name: `${user.firstName} ${user.lastName}`,
+            name: user.username,
             institution: 'National University of Singapore',
             degree: 'Bachelor of Science in Computer Science',
             graduationDate: '2020-05-15',
@@ -190,7 +199,7 @@ export class DemoDataSeeder {
           break;
         case 'EmploymentCredential':
           credentialSubject = {
-            name: `${user.firstName} ${user.lastName}`,
+            name: user.username,
             employer: 'Tech Innovations Pte Ltd',
             position: 'Senior Software Engineer',
             startDate: '2020-06-01',
@@ -199,8 +208,8 @@ export class DemoDataSeeder {
           break;
         case 'VisaCredential':
           credentialSubject = {
-            name: `${user.firstName} ${user.lastName}`,
-            passportNumber: user.passportNumber || `P${this.generateRandomHex(8)}`,
+            name: user.username,
+            passportNumber: `P${this.generateRandomHex(8)}`,
             visaType: 'Tourist',
             issueDate: '2023-01-01',
             expiryDate: '2024-01-01',
@@ -209,48 +218,45 @@ export class DemoDataSeeder {
           break;
       }
       
-      const credentialData = {
-        type: ['VerifiableCredential', credentialType],
-        issuer: issuerDID.did,
-        holder: holderDID.did,
-        subject: holderDID.did,
-        issuanceDate: new Date(),
-        expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
-        credentialSubject,
-        claims: credentialSubject,
-        status: 'active',
-        blockchain: issuerDID.blockchain,
-        blockchainTxHash: `0x${this.generateRandomHex(64)}`,
-        transactionId: `0x${this.generateRandomHex(64)}`,
-        zkpProof: {
-          proof: `0x${this.generateRandomHex(128)}`,
-          publicSignals: [`0x${this.generateRandomHex(64)}`],
-          protocol: 'groth16',
-          curve: 'bn128',
-        },
-        didId: issuerDID._id,
-      };
-      
       const existingCredential = await this.vcModel.findOne({
         issuer: issuerDID.did,
         holder: holderDID.did,
         'type.1': credentialType,
-      });
+      }).exec();
       
-      if (existingCredential) {
-        createdCredentials.push(existingCredential);
-      } else {
+      if (!existingCredential) {
+        const credentialData = {
+          type: ['VerifiableCredential', credentialType, 'DemoCredential'],
+          issuer: issuerDID.did,
+          holder: holderDID.did,
+          subject: holderDID.did,
+          issuanceDate: new Date(),
+          expirationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+          credentialSubject,
+          claims: credentialSubject,
+          status: 'active',
+          blockchain: 'ethereum',
+          blockchainTxHash: `0x${this.generateRandomHex(64)}`,
+          transactionId: `0x${this.generateRandomHex(64)}`,
+          zkpProof: {
+            proof: `0x${this.generateRandomHex(128)}`,
+            publicSignals: [`0x${this.generateRandomHex(64)}`],
+            protocol: 'groth16',
+            curve: 'bn128',
+          },
+          didId: issuerDID.id,
+        };
+        
         const newCredential = new this.vcModel(credentialData);
         await newCredential.save();
-        createdCredentials.push(newCredential);
+        createdCount++;
       }
     }
     
-    this.logger.log(`Created ${createdCredentials.length} demo credentials`);
-    return createdCredentials;
+    this.logger.log(`Created ${createdCount} demo credentials`);
   }
 
-  async createDemoDocuments(users) {
+  private async createDemoDocuments(users: User[]): Promise<void> {
     this.logger.log('Creating demo documents...');
     
     const documentTypes = [
@@ -262,8 +268,7 @@ export class DemoDataSeeder {
     ];
     
     const countries = ['Singapore', 'Saudi Arabia', 'Malaysia', 'Indonesia', 'Thailand'];
-    
-    const createdDocuments = [];
+    let createdCount = 0;
     
     for (let i = 0; i < users.length; i++) {
       const user = users[i];
@@ -279,55 +284,52 @@ export class DemoDataSeeder {
         const encryptionKey = this.generateRandomHex(32);
         const hash = this.generateRandomHex(64);
         
-        const documentData = {
-          name: `Demo ${documentType.replace('_', ' ')} for ${user.username}`,
-          description: `A demo ${documentType.replace('_', ' ')} document created for demonstration purposes`,
-          documentType,
-          country,
-          organization: this.getOrganizationForDocType(documentType, country),
-          owner: user._id,
-          filename: `demo_${documentType}_${user.username}.pdf`,
-          hash,
-          ipfsHash,
-          encryptionKey,
-          encryptionMethod: 'AES-256-CBC',
-          isVerified: Math.random() > 0.3, // 70% chance of being verified
-          verificationMethod: 'AI+Blockchain',
-          verificationResult: 'Document verified successfully',
-          aiVerificationResult: {
-            verified: true,
-            confidence: 0.95,
-            details: {
-              textAnalysis: 'passed',
-              templateMatching: 'passed',
-              anomalyDetection: 'passed',
-            },
-          },
-          blockchain: 'ethereum',
-          blockchainTxHash: `0x${this.generateRandomHex(64)}`,
-          status: Math.random() > 0.3 ? 'verified' : 'pending',
-          createdAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000), // Random date in the last 30 days
-          updatedAt: new Date(),
-          verifiedAt: Math.random() > 0.3 ? new Date() : undefined,
-        };
-        
         const existingDocument = await this.documentModel.findOne({
-          owner: user._id,
+          owner: user.id,
           documentType,
-        });
+        }).exec();
         
-        if (existingDocument) {
-          createdDocuments.push(existingDocument);
-        } else {
+        if (!existingDocument) {
+          const documentData = {
+            name: `Demo ${documentType.replace('_', ' ')} for ${user.username}`,
+            description: `A demo ${documentType.replace('_', ' ')} document created for demonstration purposes`,
+            documentType,
+            country,
+            organization: this.getOrganizationForDocType(documentType, country),
+            owner: user.id,
+            filename: `demo_${documentType}_${user.username}.pdf`,
+            hash,
+            ipfsHash,
+            encryptionKey,
+            encryptionMethod: 'AES-256-CBC',
+            isVerified: Math.random() > 0.3, // 70% chance of being verified
+            verificationMethod: 'AI+Blockchain',
+            verificationResult: 'Document verified successfully',
+            aiVerificationResult: {
+              verified: true,
+              confidence: 0.95,
+              details: {
+                textAnalysis: 'passed',
+                templateMatching: 'passed',
+                anomalyDetection: 'passed',
+              },
+            },
+            blockchain: 'ethereum',
+            blockchainTxHash: `0x${this.generateRandomHex(64)}`,
+            status: Math.random() > 0.3 ? 'verified' : 'pending',
+            createdAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000), // Random date in the last 30 days
+            updatedAt: new Date(),
+            verifiedAt: Math.random() > 0.3 ? new Date() : undefined,
+          };
+          
           const newDocument = new this.documentModel(documentData);
           await newDocument.save();
-          createdDocuments.push(newDocument);
+          createdCount++;
         }
       }
     }
     
-    this.logger.log(`Created ${createdDocuments.length} demo documents`);
-    return createdDocuments;
+    this.logger.log(`Created ${createdCount} demo documents`);
   }
 
   getOrganizationForDocType(documentType, country) {
