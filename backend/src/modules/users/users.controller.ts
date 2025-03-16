@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ForbiddenException, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, ForbiddenException, Put, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -86,5 +86,29 @@ export class UsersController {
   @Roles(UserRole.ADMIN)
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
+  }
+  
+  @Get('search')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.BUSINESS, UserRole.GOVERNMENT, UserRole.ADMIN)
+  async search(@Query('query') query: string, @Request() req: any): Promise<any[]> {
+    // Check if user has permission to search
+    if (![UserRole.BUSINESS, UserRole.GOVERNMENT, UserRole.ADMIN].includes(req.user.role)) {
+      throw new ForbiddenException('You do not have permission to search');
+    }
+    
+    // Search for users by username or email
+    const users = await this.usersService.search(query);
+    
+    // Return users with basic information
+    return users.map(user => ({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      country: user.country,
+      isActive: user.isActive,
+      approvalStatus: user.approvalStatus,
+    }));
   }
 }
