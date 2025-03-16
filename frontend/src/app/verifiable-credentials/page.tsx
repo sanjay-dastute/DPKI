@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/store';
-import { fetchMyCredentials, createCredential, deleteCredential } from '@/store/slices/vcSlice';
+import { fetchMyCredentials, createCredential, deleteCredential, verifyCredential } from '@/store/slices/vcSlice';
+import type { VerifiableCredential } from '@/types/verifiable-credential';
 import { fetchMyDIDs } from '@/store/slices/didSlice';
 import Layout from '@/components/layout/Layout';
 
@@ -45,9 +46,23 @@ export default function VerifiableCredentialsPage() {
       return;
     }
     
-    const credentialData = {
-      ...newCredentialData,
+    // Add ZKP and blockchain options
+    const credentialData: Partial<VerifiableCredential> & { 
+      useZkp: boolean; 
+      useBlockchain: boolean;
+      claims?: any;
+      credentialSubject?: any;
+    } = {
+      type: newCredentialData.type,
+      issuer: newCredentialData.issuer,
+      holder: newCredentialData.subject, // Map subject to holder
+      useZkp: true,
+      useBlockchain: true,
+      blockchain: 'ethereum',
+      credentialSubject: formattedClaims,
       claims: formattedClaims,
+      didId: newCredentialData.didId,
+      expirationDate: newCredentialData.expirationDate ? new Date(newCredentialData.expirationDate) : undefined,
     };
     
     const resultAction = await dispatch(createCredential(credentialData));
@@ -258,6 +273,16 @@ export default function VerifiableCredentialsPage() {
                         </div>
                         <div className="flex space-x-2">
                           <button
+                            onClick={() => dispatch(verifyCredential(credential.id))}
+                            className={`inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white ${
+                              credential.status === 'verified' ? 'bg-green-600 hover:bg-green-700' : 'bg-yellow-600 hover:bg-yellow-700'
+                            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                            title={credential.status || 'Click to verify this credential'}
+                          >
+                            {credential.status === 'verified' ? 'Verified ✓' : 'Verify'}
+                            {credential.zkpProof && <span className="ml-1 text-xs">(ZKP)</span>}
+                          </button>
+                          <button
                             onClick={() => router.push(`/verifiable-credentials/${credential.id}`)}
                             className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                           >
@@ -277,13 +302,13 @@ export default function VerifiableCredentialsPage() {
                             Issuer: {credential.issuer.substring(0, 15)}...
                           </p>
                           <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
-                            Subject: {credential.subject.substring(0, 15)}...
+                            Subject: {credential.holder ? credential.holder.substring(0, 15) + '...' : 'N/A'}
                           </p>
                         </div>
                         <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
                           {credential.expirationDate && (
                             <p>
-                              Expires: {formatDate(credential.expirationDate)}
+                              Expires: {formatDate(credential.expirationDate.toString())}
                             </p>
                           )}
                         </div>

@@ -30,7 +30,12 @@ export default function DIDPage() {
 
   const handleCreateDID = async (e: React.FormEvent) => {
     e.preventDefault();
-    const resultAction = await dispatch(createDID(newDIDData));
+    const resultAction = await dispatch(createDID({
+      ...newDIDData,
+      useBlockchain: true,
+      blockchain: newDIDData.method === 'ethereum' ? 'ethereum' : 
+                 newDIDData.method === 'indy' ? 'hyperledger-indy' : 'hyperledger-fabric'
+    }));
     if (createDID.fulfilled.match(resultAction)) {
       setIsCreating(false);
       setNewDIDData({
