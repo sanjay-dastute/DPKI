@@ -81,9 +81,9 @@ export class IPFSService {
     try {
       if (this.ipfs && !ipfsHash.startsWith('ipfs-')) {
         // Get from IPFS
-        const chunks = [];
+        const chunks: Buffer[] = [];
         for await (const chunk of this.ipfs.cat(ipfsHash)) {
-          chunks.push(chunk);
+          chunks.push(Buffer.from(chunk));
         }
         
         const fileBuffer = Buffer.concat(chunks);
