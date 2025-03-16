@@ -65,9 +65,9 @@ export class UsersController {
     
     // Create a safe update object
     const safeUpdateData: Partial<User> = {
-      fullName: updateUserDto.fullName,
+      username: updateUserDto.username,
       country: updateUserDto.country,
-      organization: updateUserDto.organization,
+      walletAddress: updateUserDto.walletAddress,
     };
     
     // Only admins can update these fields
