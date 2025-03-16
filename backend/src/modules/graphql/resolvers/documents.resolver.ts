@@ -59,7 +59,7 @@ export class DocumentsResolver {
     return this.documentsService.upload(
       createDocumentInput.userId,
       createDocumentInput.did,
-      createDocumentInput.type,
+      createDocumentInput.type as any,
       Buffer.from(createDocumentInput.content || '', 'base64')
     );
   }
@@ -106,7 +106,9 @@ export class DocumentsResolver {
 
   @ResolveField(() => User, { nullable: true })
   async owner(@Parent() document: Document) {
-    return this.usersService.findOne(document.userId);
+    // Use userId property if it exists, otherwise fall back to a property named 'owner'
+    const ownerId = (document as any).userId || (document as any).owner;
+    return this.usersService.findOne(ownerId);
   }
 
   @Mutation(() => Document)
