@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -62,5 +62,26 @@ export class UsersService {
   async remove(id: string): Promise<void> {
     const user = await this.findById(id);
     await this.usersRepository.remove(user);
+  }
+  
+  async search(query: string): Promise<User[]> {
+    const logger = new Logger('UsersService');
+    logger.log(`Searching users with query: ${query}`);
+    
+    try {
+      // Create query builder
+      const queryBuilder = this.usersRepository.createQueryBuilder('user');
+      
+      // Add search conditions
+      queryBuilder.where(
+        'user.username LIKE :query OR user.email LIKE :query',
+        { query: `%${query}%` }
+      );
+      
+      return queryBuilder.getMany();
+    } catch (error) {
+      logger.error(`Error searching users: ${error.message}`);
+      return [];
+    }
   }
 }

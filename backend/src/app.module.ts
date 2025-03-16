@@ -18,6 +18,7 @@ import { VerifiableCredentialsModule } from './modules/verifiable-credentials/ve
 import { DocumentsModule } from './modules/documents/documents.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { AiModule } from './modules/ai/ai.module';
+import { SearchModule } from './modules/search/search.module';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { AiModule } from './modules/ai/ai.module';
     DocumentsModule,
     AdminModule,
     AiModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [AppService],

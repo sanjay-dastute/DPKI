@@ -45,6 +45,11 @@ const Navbar: React.FC = () => {
                   <Link href="/documents" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive('/documents')}`}>
                     Documents
                   </Link>
+                  {(user?.role === 'BUSINESS' || user?.role === 'GOVERNMENT' || user?.role === 'ADMIN') && (
+                    <Link href="/search" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive('/search')}`}>
+                      Search
+                    </Link>
+                  )}
                   {user?.role === 'ADMIN' && (
                     <Link href="/admin" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive('/admin')}`}>
                       Admin

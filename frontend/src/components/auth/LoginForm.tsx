@@ -13,7 +13,7 @@ const LoginForm: React.FC = () => {
   const [directLoginError, setDirectLoginError] = useState<string | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { loading, error, isAuthenticated, user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     // Check if we already have a token in localStorage
@@ -34,11 +34,11 @@ const LoginForm: React.FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && user) {
       console.log('User is authenticated, redirecting to dashboard');
       router.push('/dashboard');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
