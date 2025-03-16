@@ -34,11 +34,11 @@ const LoginForm: React.FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && user) {
       console.log('User is authenticated, redirecting to dashboard');
       router.push('/dashboard');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
