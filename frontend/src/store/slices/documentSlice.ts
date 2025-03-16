@@ -10,17 +10,27 @@ interface Document {
   documentType: string;
   mimeType?: string;
   hash?: string;
+  ipfsHash?: string;
   encryptionKey?: string;
   encryptionAlgorithm?: string;
   isVerified: boolean;
   verificationMethod?: string;
   verificationResult?: string;
+  aiVerificationResult?: {
+    verified: boolean;
+    confidence: number;
+    details: Record<string, any>;
+  };
   country?: string;
   organization?: string;
   createdAt: Date;
-  updatedAt: Date;
+  updatedAt?: Date;
+  verifiedAt?: Date;
+  rejectedAt?: Date;
   blockchain?: string;
   transactionId?: string;
+  blockchainTxHash?: string;
+  status?: 'pending' | 'verified' | 'rejected';
 }
 
 interface DocumentState {
@@ -56,13 +66,57 @@ export const fetchMyDocuments = createAsyncThunk(
   }
 );
 
+export const shareDocument = createAsyncThunk(
+  'document/shareDocument',
+  async ({ documentId, recipientId, permissions }: { documentId: string; recipientId: string; permissions: string[] }, { getState, rejectWithValue }) => {
+    try {
+      const { auth } = getState() as RootState;
+      const response = await axios.post(`/api/documents/${documentId}/share`, {
+        recipientId,
+        permissions,
+      }, {
+        headers: {
+          Authorization: `Bearer ${auth.token}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to share document');
+    }
+  }
+);
+
+export const rejectDocument = createAsyncThunk(
+  'document/rejectDocument',
+  async ({ documentId, reason }: { documentId: string; reason: string }, { getState, rejectWithValue }) => {
+    try {
+      const { auth } = getState() as RootState;
+      const response = await axios.post(`/api/documents/${documentId}/reject`, {
+        reason,
+      }, {
+        headers: {
+          Authorization: `Bearer ${auth.token}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to reject document');
+    }
+  }
+);
+
 export const uploadDocument = createAsyncThunk(
   'document/uploadDocument',
   async ({ formData, documentData }: { formData: FormData; documentData: Partial<Document> }, { getState, rejectWithValue }) => {
     try {
       const { auth } = getState() as RootState;
       
-      // First upload the file
+      // Add encryption option to formData if not already present
+      if (!formData.has('encrypt')) {
+        formData.append('encrypt', 'true');
+      }
+      
+      // First upload the file to IPFS with encryption
       const uploadResponse = await axios.post('/api/documents/upload', formData, {
         headers: {
           Authorization: `Bearer ${auth.token}`,
@@ -75,6 +129,10 @@ export const uploadDocument = createAsyncThunk(
         ...documentData,
         filename: uploadResponse.data.filename,
         hash: uploadResponse.data.hash,
+        ipfsHash: uploadResponse.data.ipfsHash,
+        encryptionKey: uploadResponse.data.encryptionKey,
+        encryptionAlgorithm: uploadResponse.data.encryptionAlgorithm || 'AES-256-CBC',
+        blockchain: documentData.blockchain || 'ethereum',
       }, {
         headers: {
           Authorization: `Bearer ${auth.token}`,
@@ -93,7 +151,10 @@ export const verifyDocument = createAsyncThunk(
   async (id: string, { getState, rejectWithValue }) => {
     try {
       const { auth } = getState() as RootState;
-      const response = await axios.post(`/api/documents/${id}/verify`, {}, {
+      const response = await axios.post(`/api/documents/${id}/verify`, {
+        useAI: true,
+        useBlockchain: true,
+      }, {
         headers: {
           Authorization: `Bearer ${auth.token}`,
         },
@@ -113,6 +174,10 @@ export const deleteDocument = createAsyncThunk(
       await axios.delete(`/api/documents/${id}`, {
         headers: {
           Authorization: `Bearer ${auth.token}`,
+        },
+        data: {
+          unpinFromIpfs: true,
+          updateBlockchain: true,
         },
       });
       return id;
@@ -195,6 +260,44 @@ const documentSlice = createSlice({
         }
       })
       .addCase(deleteDocument.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Share document
+      .addCase(shareDocument.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(shareDocument.fulfilled, (state, action: PayloadAction<Document>) => {
+        state.loading = false;
+        const index = state.documents.findIndex((doc) => doc.id === action.payload.id);
+        if (index !== -1) {
+          state.documents[index] = action.payload;
+        }
+        if (state.currentDocument?.id === action.payload.id) {
+          state.currentDocument = action.payload;
+        }
+      })
+      .addCase(shareDocument.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Reject document
+      .addCase(rejectDocument.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(rejectDocument.fulfilled, (state, action: PayloadAction<Document>) => {
+        state.loading = false;
+        const index = state.documents.findIndex((doc) => doc.id === action.payload.id);
+        if (index !== -1) {
+          state.documents[index] = action.payload;
+        }
+        if (state.currentDocument?.id === action.payload.id) {
+          state.currentDocument = action.payload;
+        }
+      })
+      .addCase(rejectDocument.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

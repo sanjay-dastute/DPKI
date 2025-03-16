@@ -15,6 +15,12 @@ interface DID {
   updatedAt: Date;
   blockchain?: string;
   transactionId?: string;
+  blockchainTxHash?: string;
+  verkey?: string;
+  alias?: string;
+  method?: 'indy' | 'ethereum' | 'fabric';
+  network?: string;
+  country?: string;
 }
 
 interface DIDState {
@@ -52,10 +58,19 @@ export const fetchMyDIDs = createAsyncThunk(
 
 export const createDID = createAsyncThunk(
   'did/createDID',
-  async (didData: Partial<DID>, { getState, rejectWithValue }) => {
+  async (didData: Partial<DID> & { useBlockchain?: boolean }, { getState, rejectWithValue }) => {
     try {
       const { auth } = getState() as RootState;
-      const response = await axios.post('/api/did', didData, {
+      
+      // Add blockchain options if not already present
+      const enhancedDidData = {
+        ...didData,
+        useBlockchain: didData.useBlockchain !== false,
+        blockchain: didData.blockchain || 'ethereum',
+        method: didData.method || 'ethereum',
+      };
+      
+      const response = await axios.post('/api/did', enhancedDidData, {
         headers: {
           Authorization: `Bearer ${auth.token}`,
         },

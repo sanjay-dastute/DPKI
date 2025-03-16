@@ -44,8 +44,17 @@ export default function DocumentsPage() {
     
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('encrypt', 'true');
+    formData.append('storeOnIpfs', 'true');
     
-    const resultAction = await dispatch(uploadDocument({ formData, documentData }));
+    // Add blockchain options
+    const enhancedDocumentData = {
+      ...documentData,
+      useBlockchain: true,
+      blockchain: 'ethereum',
+    };
+    
+    const resultAction = await dispatch(uploadDocument({ formData, documentData: enhancedDocumentData }));
     if (uploadDocument.fulfilled.match(resultAction)) {
       setIsUploading(false);
       setFile(null);
@@ -58,7 +67,14 @@ export default function DocumentsPage() {
   };
 
   const handleVerifyDocument = async (id: string) => {
+    // Use AI and blockchain verification
     await dispatch(verifyDocument(id));
+    
+    // Show verification details after verification is complete
+    const verifiedDoc = documents.find(doc => doc.id === id);
+    if (verifiedDoc && verifiedDoc.isVerified) {
+      alert(`Document verified successfully!\nVerification method: ${verifiedDoc.verificationMethod || 'Blockchain'}\nTransaction ID: ${verifiedDoc.blockchainTxHash || verifiedDoc.transactionId || 'N/A'}`);
+    }
   };
 
   const handleDeleteDocument = async (id: string) => {
@@ -226,8 +242,12 @@ export default function DocumentsPage() {
                             className={`inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white ${
                               document.isVerified ? 'bg-green-600 hover:bg-green-700' : 'bg-yellow-600 hover:bg-yellow-700'
                             } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                            title={document.verificationResult || 'Click to verify this document'}
                           >
-                            {document.isVerified ? 'Verified' : 'Verify'}
+                            {document.isVerified ? 'Verified ✓' : 'Verify'}
+                            {document.aiVerificationResult && document.aiVerificationResult.verified && 
+                              <span className="ml-1 text-xs">(AI: {Math.round(document.aiVerificationResult.confidence * 100)}%)</span>
+                            }
                           </button>
                           <button
                             onClick={() => router.push(`/documents/${document.id}`)}

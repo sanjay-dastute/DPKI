@@ -11,12 +11,22 @@ export class CreateDocumentInput {
   @Field()
   @IsNotEmpty()
   @IsString()
-  owner: string;
+  userId: string;
 
   @Field()
   @IsNotEmpty()
   @IsString()
-  documentType: string;
+  type: string;
+  
+  @Field()
+  @IsNotEmpty()
+  @IsString()
+  did: string;
+  
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  content?: string;
 
   @Field({ nullable: true })
   @IsOptional()

@@ -5,6 +5,9 @@ import { DocumentsController } from './documents.controller';
 import { Document, DocumentSchema } from './schemas/document.schema';
 import { BlockchainModule } from '../blockchain/blockchain.module';
 import { DIDModule } from '../did/did.module';
+import { AiModule } from '../ai/ai.module';
+import { IPFSService } from './services/ipfs.service';
+import { EncryptionService } from './services/encryption.service';
 
 @Module({
   imports: [
@@ -13,9 +16,10 @@ import { DIDModule } from '../did/did.module';
     ]),
     BlockchainModule,
     DIDModule,
+    AiModule,
   ],
   controllers: [DocumentsController],
-  providers: [DocumentsService],
+  providers: [DocumentsService, IPFSService, EncryptionService],
   exports: [DocumentsService],
 })
 export class DocumentsModule {}

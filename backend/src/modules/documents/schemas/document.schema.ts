@@ -52,6 +52,24 @@ export class Document {
 
   @Prop()
   encryptionMethod: string;
+  
+  @Prop()
+  encryptionKey: string;
+  
+  @Prop()
+  blockchainTxHash: string;
+  
+  @Prop()
+  createdAt: Date;
+  
+  @Prop()
+  updatedAt: Date;
+  
+  @Prop()
+  verifiedAt: Date;
+  
+  @Prop()
+  rejectedAt: Date;
 
   @Prop({
     type: String,
