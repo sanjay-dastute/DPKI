@@ -39,12 +39,17 @@ export default function AdminPage() {
     setError('');
     
     try {
+      const token = localStorage.getItem('token');
       let response;
       
       switch (tab) {
         case 'users':
-          // In a real app, this would be an API call
-          response = await fetch('/api/admin/users');
+          response = await fetch('http://localhost:3000/users', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          
           if (response.ok) {
             const data = await response.json();
             setUsers(data);
@@ -53,7 +58,12 @@ export default function AdminPage() {
           }
           break;
         case 'dids':
-          response = await fetch('/api/admin/dids');
+          response = await fetch('http://localhost:3000/did', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          
           if (response.ok) {
             const data = await response.json();
             setDids(data);
@@ -62,7 +72,12 @@ export default function AdminPage() {
           }
           break;
         case 'credentials':
-          response = await fetch('/api/admin/credentials');
+          response = await fetch('http://localhost:3000/verifiable-credentials', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          
           if (response.ok) {
             const data = await response.json();
             setCredentials(data);
@@ -71,7 +86,12 @@ export default function AdminPage() {
           }
           break;
         case 'documents':
-          response = await fetch('/api/admin/documents');
+          response = await fetch('http://localhost:3000/documents', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          
           if (response.ok) {
             const data = await response.json();
             setDocuments(data);
@@ -84,6 +104,11 @@ export default function AdminPage() {
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred');
+      // Fallback to mock data for development/testing
+      if (tab === 'users') setUsers(mockUsers);
+      if (tab === 'dids') setDids(mockDids);
+      if (tab === 'credentials') setCredentials(mockCredentials);
+      if (tab === 'documents') setDocuments(mockDocuments);
     } finally {
       setAdminLoading(false);
     }
@@ -254,6 +279,14 @@ export default function AdminPage() {
                               <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                 {user.isActive ? 'Active' : 'Inactive'}
                               </span>
+                              {user.approvalStatus && (
+                                <span className={`ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                  ${user.approvalStatus === 'approved' ? 'bg-green-100 text-green-800' : 
+                                    user.approvalStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                                    'bg-red-100 text-red-800'}`}>
+                                  {user.approvalStatus.charAt(0).toUpperCase() + user.approvalStatus.slice(1)}
+                                </span>
+                              )}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               <button className="text-blue-600 hover:text-blue-900 mr-2">Edit</button>
